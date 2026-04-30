@@ -126,10 +126,15 @@ export const saathiChat = async (
   saathiChatRequest: SaathiChatRequest,
   options?: RequestInit,
 ): Promise<SaathiChatResponse> => {
+  const token = typeof window !== "undefined" ? window.localStorage.getItem("saathiAuthToken") : null;
   return customFetch<SaathiChatResponse>(getSaathiChatUrl(), {
     ...options,
     method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: { 
+      "Content-Type": "application/json", 
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options?.headers 
+    },
     body: JSON.stringify(saathiChatRequest),
   });
 };
