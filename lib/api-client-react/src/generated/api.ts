@@ -126,17 +126,23 @@ export const saathiChat = async (
   saathiChatRequest: SaathiChatRequest,
   options?: RequestInit,
 ): Promise<SaathiChatResponse> => {
-  const token = typeof window !== "undefined" ? window.localStorage.getItem("saathiAuthToken") : null;
-  return customFetch<SaathiChatResponse>(getSaathiChatUrl(), {
-    ...options,
+  const token = localStorage.getItem("saathiAuthToken");
+  const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "http://13.239.112.241:5000";
+  
+  const response = await fetch(`${API_BASE_URL}/api/saathi/chat`, {
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json", 
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options?.headers 
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(saathiChatRequest),
+    body: JSON.stringify({ message: saathiChatRequest.message }),
   });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return response.json();
 };
 
 export const getSaathiChatMutationOptions = <
