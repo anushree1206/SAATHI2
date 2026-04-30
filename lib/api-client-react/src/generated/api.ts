@@ -127,21 +127,23 @@ export const saathiChat = async (
   options?: RequestInit,
 ): Promise<SaathiChatResponse> => {
   const token = localStorage.getItem("saathiAuthToken");
-  const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "http://13.239.112.241:5000";
-  
+  const API_BASE_URL =
+    (import.meta as any).env?.VITE_API_URL || "https://saathi2-1.onrender.com";
+
   const response = await fetch(`${API_BASE_URL}/api/saathi/chat`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    body: JSON.stringify({ message: saathiChatRequest.message }),
+    body: JSON.stringify(saathiChatRequest),
   });
-  
+
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText}`);
   }
-  
+
   return response.json();
 };
 
